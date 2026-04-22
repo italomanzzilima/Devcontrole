@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/input";
+import { api } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const schema = z.object({
   name: z.string().min(3, "O campo nome é obrigatorio"),
@@ -29,11 +31,20 @@ export function NewCustomerForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  function handleRegisterCustomer(data: FormData) {
-    console.log(data);
+  const router = useRouter();
+
+  async function handleRegisterCustomer(data: FormData) {
+    await api.post("/api/customer", {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+    });
+
+    router.replace("/dashboard/customer");
   }
 
   return (
@@ -55,7 +66,7 @@ export function NewCustomerForm() {
         <div className="w-full">
           <label className="mb-1 text-lg font-medium">Telefone:</label>
           <Input
-            type="number"
+            type="tel"
             name="phone"
             id="phone"
             placeholder="Exemplo: (DD) XXXXXXXXX"
@@ -89,9 +100,10 @@ export function NewCustomerForm() {
 
       <button
         type="submit"
-        className="bg-blue-500 my-4 px-2 h-11 rounded-lg text-white font-bold cursor-pointer"
+        className="bg-blue-500 my-4 px-2 h-11 rounded-lg text-white font-bold cursor-pointer hover:bg-blue-400"
+        disabled={isSubmitting}
       >
-        Cadastrar
+        {isSubmitting ? "Salvando..." : "Cadastrar"}
       </button>
     </form>
   );
