@@ -44,6 +44,7 @@ export function NewCustomerForm() {
       address: data.address,
     });
 
+    router.refresh();
     router.replace("/dashboard/customer");
   }
 
