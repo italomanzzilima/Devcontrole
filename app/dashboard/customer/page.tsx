@@ -32,6 +32,10 @@ export default async function Customer() {
             <CustomerCard key={customer.id} customer={customer} />
           ))}
         </section>
+
+        {customers.length === 0 && (
+          <h1>Você ainda não possui nenhum cliente</h1>
+        )}
       </main>
     </Container>
   );

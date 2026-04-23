@@ -35,3 +35,46 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get("id");
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 400 },
+    );
+  }
+
+  const findTickets = await prisma.ticket.findFirst({
+    where: {
+      customerId: userId,
+    },
+  });
+
+  if (findTickets) {
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    await prisma.customer.delete({ where: { id: userId } });
+    return NextResponse.json({ message: "cliente deletado com sucesso!" });
+  } catch (error) {
+    console.log(error);
+
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 400 },
+    );
+  }
+}
