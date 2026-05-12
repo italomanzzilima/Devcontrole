@@ -43,3 +43,32 @@ export async function PATCH(request: Request) {
     );
   }
 }
+
+export async function POST(request: Request) {
+  const { customerId, name, description } = await request.json();
+
+  if (!customerId || !name || !description) {
+    return NextResponse.json(
+      { error: "failed to create ticket" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    await prisma.ticket.create({
+      data: {
+        name,
+        description,
+        status: "open",
+        customerId: customerId,
+      },
+    });
+
+    return NextResponse.json({ message: "Ticket updated successfully" });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "failed to create ticket", cause: error },
+      { status: 400 },
+    );
+  }
+}

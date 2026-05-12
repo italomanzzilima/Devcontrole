@@ -14,8 +14,10 @@ export async function TicketTable() {
 
   const tickets: TicketProps[] = await prisma.ticket.findMany({
     where: {
-      userId: session.user.id,
       status: "open",
+      customer: {
+        userId: session.user.id,
+      },
     },
     include: {
       customer: true,
